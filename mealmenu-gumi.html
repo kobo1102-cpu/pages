@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>구미캠퍼스 식단정보</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2330;--sub:#667085;--line:#e4e7ec;--accent:#1f6feb;--accent-bg:#e8f0fe;--tag:#fff1d6;--tag-text:#8a5a00;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b202a;--text:#e8ebf2;--sub:#98a2b3;--line:#2b3240;--accent:#6ea8ff;--accent-bg:#1f2c47;--tag:#3a2f14;--tag-text:#f5c970;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b202a;--text:#e8ebf2;--sub:#98a2b3;--line:#2b3240;--accent:#6ea8ff;--accent-bg:#1f2c47;--tag:#3a2f14;--tag-text:#f5c970;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5}
+main{max-width:720px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:22px;margin:4px 0 2px}
+.sub{color:var(--sub);font-size:13px;margin:0 0 16px}
+.wx{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.wx h2{font-size:15px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.wx h2 small{font-weight:400;color:var(--sub);font-size:12px}
+.wx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wx-box{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.wx-box .d{font-size:12px;color:var(--sub)}
+.wx-box .t{font-size:22px;font-weight:700;margin:2px 0}
+.wx-box .t span{font-size:14px;font-weight:400;color:var(--sub)}
+.wx-box .c{font-size:13px}
+.wx-tip{margin:10px 0 0;font-size:13px;color:var(--sub)}
+.wx-stale{display:none;margin:8px 0 0;font-size:12px;color:var(--tag-text);background:var(--tag);padding:6px 10px;border-radius:8px}
+.wx.stale .wx-stale{display:block}
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.time{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;color:var(--sub)}
+.time b{display:block;color:var(--text);font-size:14px;margin-bottom:2px}
+.time.now{border-color:var(--accent);background:var(--accent-bg)}
+.days{display:flex;gap:6px;margin-bottom:14px}
+.days button{flex:1;padding:10px 0;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;font:inherit;font-size:14px;cursor:pointer}
+.days button.sel{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.days button.today:not(.sel){border-color:var(--accent);color:var(--accent)}
+.meal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+.meal.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.meal h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+.meal h2 small{font-weight:400;color:var(--sub);font-size:12px}
+.tag{display:inline-block;background:var(--tag);color:var(--tag-text);font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;margin-bottom:8px}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+li{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:14px}
+.note{color:var(--sub);font-size:12px;margin:12px 2px}
+.empty{color:var(--sub);text-align:center;padding:28px 0}
+details{margin-top:18px}
+summary{cursor:pointer;font-weight:700;font-size:14px;padding:6px 0}
+.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-top:8px}
+table{border-collapse:collapse;min-width:640px;width:100%;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;text-align:left}
+th{background:var(--bg);white-space:nowrap}
+tr:last-child td{border-bottom:0}td:last-child,th:last-child{border-right:0}
+td.today,th.today{background:var(--accent-bg)}
+a{color:var(--accent)}
+footer{margin-top:20px;font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body>
+<main>
+  <h1>🍚 구미캠퍼스 식단정보</h1>
+  <p class="sub">한국폴리텍대학 구미캠퍼스 · 10월 26일 ~ 30일 학생식당 메뉴</p>
+
+  <section class="wx" id="wx">
+    <h2>🌤️ 구미 날씨 <small>10월 29일 오전 기준</small></h2>
+    <div class="wx-grid">
+      <div class="wx-box"><div class="d">오늘 (목) 10/29</div><div class="t">13° <span>/ 2°</span></div><div class="c">☁️ 구름 많음 · 비 20% → 30%<br>아침 3.2° · 습도 82%</div></div>
+      <div class="wx-box"><div class="d">내일 (금) 10/30</div><div class="t">☔ 오전 비</div><div class="c">구름 많고 한때 비 60%<br>오후에는 구름 많음 20%</div></div>
+    </div>
+    <p class="wx-tip">아침저녁으로 쌀쌀하고 일교차가 커요. 내일 오전에는 우산을 챙기세요.</p>
+    <p class="wx-stale">⚠️ 이 날씨는 10월 29일 예보예요. 최신 날씨는 업데이트가 필요해요.</p>
+  </section>
+
+  <div class="times" id="times">
+    <div class="time" data-m="0"><b>아침</b>07:50 ~ 08:40</div>
+    <div class="time" data-m="1"><b>점심</b>11:50 ~ 13:10</div>
+    <div class="time" data-m="2"><b>저녁</b>16:50 ~ 17:40</div>
+  </div>
+
+  <div class="days" id="days"></div>
+  <div id="meals"></div>
+
+  <p class="note">※ 메뉴는 식당 운영 및 식자재 수급 상황에 따라 변경될 수 있습니다.<br>※ 저녁은 수업이 있는 학생 대상 월~목 18시까지 운영합니다.</p>
+
+  <details>
+    <summary>주간 전체 보기</summary>
+    <div class="wrap"><table id="week"></table></div>
+  </details>
+
+  <footer>식단은 10월 29일에 학교 홈페이지에서, 날씨는 같은 날 오전 기상청 예보 기준으로 가져온 스냅샷이에요. 최신 식단은 <a href="https://www.kopo.ac.kr/gumi/content.do?menu=4941" target="_blank" rel="noopener">원본 페이지</a>에서 확인하세요.</footer>
+</main>
+
+<script>
+const DAYS=["월","화","수","목","금"];
+const NAMES=["조식","중식","석식"];
+const MENU=[
+ ["컵밥, 음료","잡곡밥, 만둣국, 돈갈비찜, 꽃맛살샐러드, 오이양파무침, 포기김치","쌀밥, 얼큰쇠고기무국, 두부조림, 모듬강정, 호박당근볶음, 포기김치"],
+ ["모카크림빵, 흰우유","잡곡밥, 참치김치찌개, 어니언치킨까스, 건새우마늘쫑무침, 단배추생채, 깍두기","흰밥, 돼지국밥, 야채고로케/케찹, 풋고추된장무침, 부추양파무침, 석박지/요구르트"],
+ ["컵밥, 음료","나가사끼짬뽕, 마파두부, 깐쇼새우, 토마토샐러드/드레싱, 포기김치, 흰밥","흰밥, 유부장국, 불닭볶음닭, 맛감자/케이준S, 케요네즈, 포기김치"],
+ ["모카크림빵, 흰우유","잡곡밥, 조랭이미역국, 바싹불고기/파채, 무조림, 명엽채조림, 포기김치","흰밥, 부대찌개, 계란후라이, 청양멸치볶음, 상추양파무침, 포기김치"],
+ ["컵밥, 음료","콩나물밥/양념장, 바지락고추장찌개, 팽이버섯짬뽕조림, 도시락김, 포기김치, 음료","쌀밥, 계란탕, 오징어당면볶음, 강된장, 양배추찜/간장, 포기김치"]
+];
+const RANGES=[[470,520],[710,790],[1010,1060]];
+
+const now=new Date();
+const dow=now.getDay();               // 0=일
+const todayIdx=(dow>=1&&dow<=5)?dow-1:-1;
+let sel=todayIdx>=0?todayIdx:0;
+const mins=now.getHours()*60+now.getMinutes();
+const nowMeal=todayIdx>=0?RANGES.findIndex(r=>mins>=r[0]-30&&mins<=r[1]):-1;
+
+function parse(s){
+  const dish=[];let special=false;
+  s.split(",").map(x=>x.trim()).filter(Boolean).forEach(x=>{
+    if(x.includes("일품요리")) special=true; else dish.push(x);
+  });
+  return {dish,special};
+}
+function esc(t){return t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+
+function renderDays(){
+  const el=document.getElementById("days");
+  el.innerHTML="";
+  DAYS.forEach((d,i)=>{
+    const b=document.createElement("button");
+    b.textContent=d;
+    if(i===sel)b.classList.add("sel");
+    if(i===todayIdx)b.classList.add("today");
+    b.onclick=()=>{sel=i;renderDays();renderMeals();};
+    el.appendChild(b);
+  });
+}
+function renderMeals(){
+  const el=document.getElementById("meals");
+  let html="";
+  if(todayIdx<0&&sel===0&&false){}
+  MENU[sel].forEach((s,m)=>{
+    const {dish,special}=parse(s);
+    const isNow=sel===todayIdx&&m===nowMeal;
+    html+=`<section class="meal${isNow?" now":""}"><h2>${NAMES[m]}<small>${isNow?"지금 운영 시간 · ":""}${["07:50 ~ 08:40","11:50 ~ 13:10","16:50 ~ 17:40"][m]}</small></h2>`+
+      (special?`<span class="tag">일품요리</span>`:"")+
+      `<ul>${dish.map(d=>`<li>${esc(d)}</li>`).join("")}</ul></section>`;
+  });
+  if(todayIdx<0) html=`<div class="empty">토·일요일은 식당을 운영하지 않아요. 월요일 식단을 보여드려요.</div>`+html;
+  el.innerHTML=html;
+}
+function renderWeek(){
+  let h="<thead><tr><th>구분</th>"+DAYS.map((d,i)=>`<th class="${i===todayIdx?"today":""}">${d}요일</th>`).join("")+"</tr></thead><tbody>";
+  NAMES.forEach((n,m)=>{
+    h+=`<tr><th>${n}</th>`+MENU.map((day,i)=>{
+      const {dish,special}=parse(day[m]);
+      return `<td class="${i===todayIdx?"today":""}">${special?"<b>[일품요리]</b> ":""}${esc(dish.join(", "))}</td>`;
+    }).join("")+"</tr>";
+  });
+  document.getElementById("week").innerHTML=h+"</tbody>";
+}
+document.querySelectorAll(".time").forEach(t=>{ if(+t.dataset.m===nowMeal) t.classList.add("now"); });
+(function(){const d=now,ok=d.getFullYear()===2026&&d.getMonth()===9&&d.getDate()===29;if(!ok)document.getElementById("wx").classList.add("stale");})();
+renderDays();renderMeals();renderWeek();
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2F5BFF">
+<title>오늘의 운동</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5FF; --card:#fff; --ink:#151A33; --sub:#6B7394; --line:#E3E8FA;
+  --blue:#2F5BFF; --coral:#FF6B3D; --aqua:#00B8A9; --sun:#FFB81F; --track:#E9EDFB;
+  --pad:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0E1226; --card:#181E3A; --ink:#F1F3FF; --sub:#98A0C8; --line:#262E52; --track:#252C50;}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 24px);max-width:520px;margin:0 auto}
+.hero{background:linear-gradient(135deg,var(--blue),#6A3DFF);color:#fff;padding:22px var(--pad) 64px;border-radius:0 0 28px 28px}
+.hero h1{font-family:"Black Han Sans",inherit;font-weight:400;font-size:30px;margin:0 0 4px;letter-spacing:.5px}
+.hero p{margin:0;opacity:.85;font-size:14px}
+.monthbar{display:flex;align-items:center;justify-content:space-between;margin-top:18px}
+.monthbar b{font-size:19px}
+.nav{width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
+.nav:active{background:rgba(255,255,255,.32)}
+main{padding:0 var(--pad);margin-top:-44px}
+.card{background:var(--card);border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 6px 20px rgba(47,91,255,.10)}
+.card h2{margin:0 0 12px;font-size:16px}
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x proximity;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{flex:0 0 auto;width:48px;padding:8px 0;border-radius:16px;border:2px solid transparent;background:var(--track);color:var(--sub);text-align:center;font-size:12px;cursor:pointer;scroll-snap-align:center;font:inherit;font-size:12px}
+.day b{display:block;font-size:17px;color:var(--ink);margin-top:2px}
+.day.done{background:#DDF5F2;color:var(--aqua)}
+@media (prefers-color-scheme:dark){.day.done{background:#16373A}}
+.day.sel{border-color:var(--blue);background:var(--blue);color:#fff}
+.day.sel b{color:#fff}
+.day i{display:block;width:6px;height:6px;border-radius:50%;margin:4px auto 0;background:transparent}
+.day.has i{background:var(--coral)}
+.day.sel.has i{background:#fff}
+.seldate{font-size:15px;font-weight:700;margin:2px 0 12px}
+.row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.ico{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:24px;flex:0 0 auto}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:16px}
+.row .t span{font-size:12px;color:var(--sub)}
+.toggle{width:48px;height:48px;border-radius:14px;border:2.5px solid var(--line);background:transparent;color:#fff;font-size:28px;font-weight:900;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0;transition:background .15s,transform .15s}
+.toggle:active{transform:scale(.92)}
+.toggle.on{border-color:transparent}
+.toggle.swim.on{background:var(--aqua)}
+.toggle.hang.on{background:var(--sun);color:#3a2a00}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:44px;height:44px;border-radius:50%;border:0;background:var(--track);color:var(--ink);font-size:22px;font-weight:700;cursor:pointer}
+.stepper button:active{transform:scale(.92)}
+.stepper input{width:64px;height:44px;border:2px solid var(--line);border-radius:14px;background:transparent;color:var(--ink);text-align:center;font-size:18px;font-weight:800;font-family:inherit}
+.stepper input:focus{outline:none;border-color:var(--blue)}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{border-radius:18px;padding:12px 14px;color:#fff}
+.stat small{display:block;opacity:.9;font-size:12px}
+.stat strong{font-size:26px;font-family:"Black Han Sans",inherit;font-weight:400}
+.stat em{font-style:normal;font-size:13px;opacity:.9;margin-left:2px}
+.s1{background:var(--coral)}.s2{background:var(--blue)}.s3{background:var(--aqua)}.s4{background:var(--sun);color:#3a2a00}
+.chart{display:flex;align-items:flex-end;gap:2px;height:130px;padding-top:6px}
+.bar{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;background:none;border:0;padding:0;cursor:pointer}
+.bar span{display:block;width:100%;border-radius:4px 4px 0 0;min-height:3px;background:var(--track);transition:height .3s}
+.bar.v span{background:var(--c)}
+.bar.sel span{outline:2px solid var(--ink);outline-offset:1px}
+.axis{display:flex;gap:2px;font-size:10px;color:var(--sub);margin-top:4px}
+.axis span{flex:1;text-align:center;min-width:0;overflow:visible;white-space:nowrap}
+.cmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);margin-bottom:4px}
+.cmeta b{color:var(--ink)}
+.big{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.big strong{font-family:"Black Han Sans",inherit;font-weight:400;font-size:40px;line-height:1}
+.big span{color:var(--sub);font-size:14px}
+.dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dot{aspect-ratio:1;border-radius:10px;background:var(--track);display:grid;place-items:center;font-size:12px;color:var(--sub);font-weight:700;border:0;cursor:pointer}
+.dot.on{color:#fff;background:var(--c)}
+.dot.sel{outline:2px solid var(--ink);outline-offset:1px}
+.foot{text-align:center;color:var(--sub);font-size:12px;margin-top:6px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:22px;font-size:14px;font-weight:700;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>오늘의 운동</h1>
+  <p id="greet">오늘도 한 걸음 더!</p>
+  <div class="monthbar">
+    <button class="nav" id="prev" aria-label="이전 달">‹</button>
+    <b id="mlabel"></b>
+    <button class="nav" id="next" aria-label="다음 달">›</button>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="days" id="days" aria-label="날짜 선택"></div>
+    <div class="seldate" id="seldate"></div>
+
+    <div class="row">
+      <div class="ico" style="background:#DDF5F2">🏊</div>
+      <div class="t"><b>수영</b><span>오늘 했나요?</span></div>
+      <button class="toggle swim" id="swim" role="checkbox" aria-checked="false" aria-label="수영 했음"></button>
+    </div>
+
+    <div class="row">
+      <div class="ico" style="background:#FFE9E1">🏃</div>
+      <div class="t"><b>달리기</b><span>km</span></div>
+      <div class="stepper">
+        <button data-run="-0.1" aria-label="0.1km 줄이기">−</button>
+        <input id="run" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0">
+        <button data-run="0.1" aria-label="0.1km 늘리기">+</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="ico" style="background:#E4EAFF">💪</div>
+      <div class="t"><b>푸시업</b><span>개</span></div>
+      <div class="stepper">
+        <button data-push="-1" aria-label="1개 줄이기">−</button>
+        <input id="push" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
+        <button data-push="1" aria-label="1개 늘리기">+</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="ico" style="background:#FFF1CF">🤸</div>
+      <div class="t"><b>매달리기</b><span>오늘 했나요?</span></div>
+      <button class="toggle hang" id="hang" role="checkbox" aria-checked="false" aria-label="매달리기 했음"></button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 id="sumtitle"></h2>
+    <div class="sum">
+      <div class="stat s1"><small>달리기 합계</small><strong id="sRun">0</strong><em>km</em></div>
+      <div class="stat s2"><small>푸시업 합계</small><strong id="sPush">0</strong><em>개</em></div>
+      <div class="stat s3"><small>수영</small><strong id="sSwim">0</strong><em>일</em></div>
+      <div class="stat s4"><small>매달리기</small><strong id="sHang">0</strong><em>일</em></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>달리기 (km)</h2>
+    <div class="cmeta"><span>하루 최고 <b id="mRun">0</b> km</span><span>운동한 날 평균 <b id="aRun">0</b> km</span></div>
+    <div class="chart" id="cRun"></div><div class="axis" id="xRun"></div>
+  </section>
+
+  <section class="card">
+    <h2>푸시업 (개)</h2>
+    <div class="cmeta"><span>하루 최고 <b id="mPush">0</b> 개</span><span>운동한 날 평균 <b id="aPush">0</b> 개</span></div>
+    <div class="chart" id="cPush"></div><div class="axis" id="xPush"></div>
+  </section>
+
+  <section class="card">
+    <h2>수영</h2>
+    <div class="big"><strong id="nSwim">0</strong><span id="tSwim"></span></div>
+    <div class="dots" id="dSwim"></div>
+  </section>
+
+  <section class="card">
+    <h2>매달리기</h2>
+    <div class="big"><strong id="nHang">0</strong><span id="tHang"></span></div>
+    <div class="dots" id="dHang"></div>
+  </section>
+
+  <p class="foot">기록은 이 기기의 브라우저에 자동 저장돼요.</p>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var KEY='workout-checklist-v1';
+  var data={};
+  var memStore=null;
+  function load(){
+    try{var s=localStorage.getItem(KEY);if(s)data=JSON.parse(s)||{};}catch(e){data=memStore||{};}
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){memStore=data;toast('저장 공간을 쓸 수 없어요');}
+  }
+  var $=function(id){return document.getElementById(id)};
+  var pad=function(n){return n<10?'0'+n:''+n};
+  var key=function(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d)};
+  var now=new Date(), todayKey=key(now.getFullYear(),now.getMonth(),now.getDate());
+  var vy=now.getFullYear(), vm=now.getMonth(), sel=todayKey;
+  var WD=['일','월','화','수','목','금','토'];
+  var tt;
+  function toast(t){var el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){el.classList.remove('show')},1400);}
+  function get(k){return data[k]||{swim:false,run:0,push:0,hang:false};}
+  function has(r){return r.swim||r.hang||r.run>0||r.push>0;}
+  function dim(){return new Date(vy,vm+1,0).getDate();}
+  function fmt(n){return (Math.round(n*10)/10).toString();}
+  function update(patch){
+    var r=Object.assign({},get(sel),patch);
+    if(has(r))data[sel]=r;else delete data[sel];
+    save();render();
+  }
+
+  function render(){
+    var n=dim(), isThis=(vy===now.getFullYear()&&vm===now.getMonth());
+    $('mlabel').textContent=vy+'년 '+(vm+1)+'월';
+    $('sumtitle').textContent=(vm+1)+'월 한눈에 보기';
+    $('greet').textContent=isThis?'오늘도 한 걸음 더!':'지난 기록을 확인하고 고쳐 보세요';
+
+    // day strip
+    var ds=$('days'), prevScroll=ds.scrollLeft, html='';
+    for(var d=1;d<=n;d++){
+      var k=key(vy,vm,d), r=get(k), wd=WD[new Date(vy,vm,d).getDay()];
+      var cls='day'+(k===sel?' sel':'')+(has(r)?' has':'')+(k===todayKey?' today':'');
+      html+='<button class="'+cls+'" data-k="'+k+'">'+wd+'<b>'+d+'</b><i></i></button>';
+    }
+    ds.innerHTML=html;
+    ds.scrollLeft=prevScroll;
+
+    // selected day form
+    var sd=sel.split('-'), r=get(sel);
+    $('seldate').textContent=(+sd[1])+'월 '+(+sd[2])+'일 ('+WD[new Date(+sd[0],+sd[1]-1,+sd[2]).getDay()]+')'+(sel===todayKey?' · 오늘':'');
+    setToggle($('swim'),r.swim);setToggle($('hang'),r.hang);
+    if(document.activeElement!==$('run'))$('run').value=r.run>0?fmt(r.run):'';
+    if(document.activeElement!==$('push'))$('push').value=r.push>0?r.push:'';
+
+    // month stats
+    var sumRun=0,sumPush=0,swim=0,hang=0,maxRun=0,maxPush=0,runDays=0,pushDays=0;
+    var runVals=[],pushVals=[],swimArr=[],hangArr=[];
+    for(d=1;d<=n;d++){
+      var q=get(key(vy,vm,d));
+      runVals.push(q.run);pushVals.push(q.push);swimArr.push(q.swim);hangArr.push(q.hang);
+      sumRun+=q.run;sumPush+=q.push;
+      if(q.swim)swim++;if(q.hang)hang++;
+      if(q.run>0)runDays++;if(q.push>0)pushDays++;
+      maxRun=Math.max(maxRun,q.run);maxPush=Math.max(maxPush,q.push);
+    }
+    $('sRun').textContent=fmt(sumRun);$('sPush').textContent=sumPush;
+    $('sSwim').textContent=swim;$('sHang').textContent=hang;
+    $('mRun').textContent=fmt(maxRun);$('aRun').textContent=runDays?fmt(sumRun/runDays):0;
+    $('mPush').textContent=maxPush;$('aPush').textContent=pushDays?Math.round(sumPush/pushDays):0;
+
+    bars('cRun','xRun',runVals,maxRun,'var(--coral)',n);
+    bars('cPush','xPush',pushVals,maxPush,'var(--blue)',n);
+    dots('dSwim',swimArr,'var(--aqua)',n);dots('dHang',hangArr,'var(--sun)',n);
+    $('nSwim').textContent=swim;$('nHang').textContent=hang;
+    var label=isThis?'이번 달':(vm+1)+'월';
+    $('tSwim').textContent='일 · '+label+' 수영한 날';
+    $('tHang').textContent='일 · '+label+' 매달리기한 날';
+  }
+  function setToggle(b,on){b.classList.toggle('on',on);b.textContent=on?'✓':'';b.setAttribute('aria-checked',on);}
+  function bars(cid,xid,vals,max,color,n){
+    var h='',x='';
+    for(var i=0;i<n;i++){
+      var k=key(vy,vm,i+1), v=vals[i], pct=max>0?Math.max(v/max*100,0):0;
+      h+='<button class="bar'+(v>0?' v':'')+(k===sel?' sel':'')+'" data-k="'+k+'" style="--c:'+color+'" aria-label="'+(i+1)+'일 '+v+'"><span style="height:'+(v>0?Math.max(pct,6):3)+'%"></span></button>';
+      x+='<span>'+((i+1)%5===0||i===0?(i+1):'')+'</span>';
+    }
+    $(cid).innerHTML=h;$(xid).innerHTML=x;
+  }
+  function dots(id,arr,color,n){
+    var h='';
+    for(var i=0;i<n;i++){
+      var k=key(vy,vm,i+1);
+      h+='<button class="dot'+(arr[i]?' on':'')+(k===sel?' sel':'')+'" data-k="'+k+'" style="--c:'+color+'">'+(i+1)+'</button>';
+    }
+    $(id).innerHTML=h;
+  }
+
+  function pick(k){sel=k;render();}
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-k]');
+    if(t){pick(t.getAttribute('data-k'));return;}
+    var b=e.target.closest('button');if(!b)return;
+    var r=get(sel);
+    if(b.id==='swim'){update({swim:!r.swim});toast(!r.swim?'수영 완료! 🏊':'수영 기록을 취소했어요');}
+    else if(b.id==='hang'){update({hang:!r.hang});toast(!r.hang?'매달리기 완료! 🤸':'매달리기 기록을 취소했어요');}
+    else if(b.hasAttribute('data-run')){update({run:Math.max(0,Math.round((r.run+parseFloat(b.getAttribute('data-run')))*10)/10)});}
+    else if(b.hasAttribute('data-push')){update({push:Math.max(0,r.push+parseInt(b.getAttribute('data-push'),10))});}
+  });
+  $('run').addEventListener('change',function(){var v=parseFloat(this.value);update({run:isNaN(v)||v<0?0:Math.round(v*10)/10});});
+  $('push').addEventListener('change',function(){var v=parseInt(this.value,10);update({push:isNaN(v)||v<0?0:v});});
+  [$('run'),$('push')].forEach(function(el){el.addEventListener('keydown',function(e){if(e.key==='Enter')el.blur();});});
+
+  function shift(d){
+    vm+=d;if(vm<0){vm=11;vy--;}if(vm>11){vm=0;vy++;}
+    sel=(vy===now.getFullYear()&&vm===now.getMonth())?todayKey:key(vy,vm,1);
+    render();
+    scrollSel(true);
+  }
+  function scrollSel(instant){
+    var el=document.querySelector('.day.sel');
+    if(el)el.scrollIntoView({inline:'center',block:'nearest',behavior:instant?'auto':'smooth'});
+  }
+  $('prev').onclick=function(){shift(-1)};
+  $('next').onclick=function(){shift(1)};
+
+  load();render();scrollSel(true);
+})();
+</script>
+</body>
+</html>
